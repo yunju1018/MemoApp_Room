@@ -1,15 +1,16 @@
 package com.example.memoapp_room
 
 import android.annotation.SuppressLint
-import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.memoapp_room.databinding.ActivityMainBinding
+import kotlinx.coroutines.*
 
 @SuppressLint("StaticFieldLeak")
 class MainActivity : AppCompatActivity(), OnDeleteListener {
-
+    lateinit var myAdapter: MyAdapter
     lateinit var binding: ActivityMainBinding
     lateinit var db: MemoDataBase
     var memoList = listOf<MemoEntity>()
@@ -17,65 +18,79 @@ class MainActivity : AppCompatActivity(), OnDeleteListener {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        db = MemoDataBase.getInstance(this)!!
+        MemoDataBase.getInstance(this)?.let {
+            db = it
+        }
+
+        setLayout()
+    }
+
+    private fun setLayout() {
+        myAdapter = MyAdapter(this, this)
+
+        binding.recyclerView.adapter = myAdapter
 
         binding.button.setOnClickListener {
             val memo = MemoEntity(null, binding.edtMemo.text.toString())
-            insertMemo(memo)
+            runBlocking {
+                insertMemo(memo)
+            }
             binding.edtMemo.setText("")
         }
 
+        binding.deleteAll.setOnClickListener {
+            runBlocking {
+                deleteAll()
+            }
+        }
+
+        runBlocking {
+            getAllMemos()
+        }
+    }
+
+    private suspend fun insertMemo(memo: MemoEntity) {
+        // Background Thread 사용 (CoroutineScope)
+        CoroutineScope(Dispatchers.IO).launch {
+            db.memoDAO().insertMemo(memo)
+            Log.d("yj", "CoroutineScope insertMemo")
+        }.join()
         getAllMemos()
     }
 
-    fun insertMemo(memo: MemoEntity) {
-        // Background Thread 사용
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.memoDAO().insertMemo(memo)
-            }
-
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                getAllMemos()
-            }
-        }
-        insertTask.execute()
+    private suspend fun getAllMemos() {
+        CoroutineScope(Dispatchers.IO).launch {
+            memoList = db.memoDAO().getAll()
+            Log.d("yj", "CoroutineScope getAllMemos")
+        }.join()
+        changeMemoList(memoList)
     }
 
-    fun getAllMemos() {
-        val getAllTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                memoList = db.memoDAO().getAll()
-            }
-
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                setRecyclerView(memoList)
-            }
-        }
-        getAllTask.execute()
+    private suspend fun deleteMemo(memo: MemoEntity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d("yj", "CoroutineScope deleteMemo")
+            db.memoDAO().delete(memo)
+        }.join()
+        getAllMemos()
     }
 
-    fun deleteMemo(memo: MemoEntity) {
-        val deleteTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.memoDAO().delete(memo)
-            }
-
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                getAllMemos()
-            }
-        }
-        deleteTask.execute()
+    private suspend fun deleteAll() {
+        CoroutineScope(Dispatchers.IO).launch {
+            db.memoDAO().deleteAll()
+            Log.d("yj", "CoroutineScope deleteAll")
+        }.join()
+        getAllMemos()
     }
 
-    fun setRecyclerView(memoList: List<MemoEntity>) {
-        binding.recyclerView.adapter = MyAdapter(this, memoList, this)
+    private fun changeMemoList(memoList: List<MemoEntity>) {
+        myAdapter.setList(memoList)
+        Log.d("yj", "setRecyclerView().Called")
     }
 
     override fun onDeleteListener(memo: MemoEntity) {
-        deleteMemo(memo)
+        Log.d("yj", "onDeleteListener.Called")
+        runBlocking {
+            deleteMemo(memo)
+        }
     }
 }

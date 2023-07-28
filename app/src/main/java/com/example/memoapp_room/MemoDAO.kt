@@ -1,10 +1,7 @@
 package com.example.memoapp_room
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.Companion.REPLACE
-import androidx.room.Query
 
 // Data 접근(Access) 쿼리 정의
 @Dao
@@ -17,4 +14,7 @@ interface MemoDAO {
 
     @Delete
     fun delete(memo : MemoEntity)
+
+    @Query("DELETE FROM memo")
+    fun deleteAll()
 }
