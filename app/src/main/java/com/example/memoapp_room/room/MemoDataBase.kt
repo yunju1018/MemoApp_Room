@@ -1,4 +1,4 @@
-package com.example.memoapp_room
+package com.example.memoapp_room.room
 
 import android.content.Context
 import androidx.room.Database
@@ -20,7 +20,8 @@ abstract class MemoDataBase : RoomDatabase() {
                         context.applicationContext,
                         MemoDataBase::class.java,
                         "memo.db"
-                    ).fallbackToDestructiveMigration().build()  // 새로운 데이터로 덮어씀
+                    ).fallbackToDestructiveMigration()
+                        .build()  // 새로운 데이터로 덮어씀
                 }
             }
 

@@ -1,4 +1,4 @@
-package com.example.memoapp_room
+package com.example.memoapp_room.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
