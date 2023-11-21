@@ -8,8 +8,13 @@ import androidx.room.PrimaryKey
 // 데이터베이스 테이블의 각 행 고유 식별 기본 키(PrimaryKey) 정의 필수 (자동 할당 autoGenerate = true)
 // id 값을 null로 넣어줘도 자동으로 값이 할당된다.
 data class MemoEntity(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     var id: Long?,
     var memo: String = ""
 )
+
+/**
+ * todo : PrimaryKey (날짜) 기준 ViewPager
+ * memo List typeConverter 사용 리스트 만들기 (hashmap 되나?? 확인)
+ */
 
