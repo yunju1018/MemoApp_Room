@@ -22,6 +22,10 @@ class MemoRepository(private val memoDao: MemoDAO) {
         return memoDao.getAll()
     }
 
+    fun getMemoData(memoId: Long): LiveData<MemoEntity> {
+        return memoDao.getMemo(memoId)
+    }
+
     @WorkerThread
     fun deleteAll() {
         memoDao.deleteAll()

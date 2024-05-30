@@ -26,7 +26,7 @@ class MemoAdapter(val context: Context, private val callback: ((MemoEntity) -> U
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val memo: MemoEntity = memoList[position]
-        holder.bind(memo)
+        holder.bind(memo, position)
     }
 
     fun setList(memoList: List<MemoEntity>) {
@@ -36,8 +36,8 @@ class MemoAdapter(val context: Context, private val callback: ((MemoEntity) -> U
 
     inner class MyViewHolder(private val binding: ItemMemoBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(memo: MemoEntity) {
-            binding.textViewMemo.text = memo.memo
+        fun bind(memo: MemoEntity, position: Int) {
+            binding.textViewMemo.text = memo.memoList[position].memo
 
             itemView.setOnLongClickListener(View.OnLongClickListener {
                 AlertDialog.Builder(context)

@@ -11,12 +11,13 @@ import androidx.lifecycle.Observer
 import com.example.memoapp_room.MemoApplication
 import com.example.memoapp_room.R
 import com.example.memoapp_room.databinding.ActivityMainBinding
+import com.example.memoapp_room.memo.models.MemoData
 import com.example.memoapp_room.room.MemoEntity
 import com.example.memoapp_room.viewmodel.MemoViewModel
 import com.example.memoapp_room.viewmodel.MemoViewModelFactory
-import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 @SuppressLint("StaticFieldLeak")
 class MainActivity : AppCompatActivity() {
@@ -48,6 +49,9 @@ class MainActivity : AppCompatActivity() {
     private fun observe() {
         viewModel.memoList.observe(this, Observer {
             memoAdapter.setList(it)
+            it.forEach{entity ->
+                Log.d("yj", "memoEntities : ${entity.id} , ${entity.memoList}")
+            }
         })
     }
 
@@ -56,11 +60,19 @@ class MainActivity : AppCompatActivity() {
             viewModel.deleteMemo(it)
         }
 
+        val memoEntity = viewModel.getMemoData(keyDateFormat.format(date.time).toLong())
+        Log.d("yj", "today data : $memoEntity")
+
         binding.recyclerView.adapter = memoAdapter
 
         binding.button.setOnClickListener {
             val key = keyDateFormat.format(date.time)
-            val memo = MemoEntity(key.toLong(), binding.edtMemo.text.toString())
+
+            Log.d("yj", "key : $key")
+            val memoList = ArrayList<MemoData>()
+            memoList.add(MemoData(binding.edtMemo.text.toString()))
+
+            val memo = MemoEntity(key.toLong(), memoList)
             viewModel.insertMemo(memo)
             binding.edtMemo.setText("")
         }

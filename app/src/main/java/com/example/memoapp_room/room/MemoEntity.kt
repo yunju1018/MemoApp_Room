@@ -2,6 +2,7 @@ package com.example.memoapp_room.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.memoapp_room.memo.models.MemoData
 
 // 데이터베이스에 데이터 스키마(데이터베이스의 구조와 제약조건에 관한 전반적인 명세를 기술)
 @Entity(tableName = "memo")
@@ -10,7 +11,7 @@ import androidx.room.PrimaryKey
 data class MemoEntity(
     @PrimaryKey
     var id: Long?,
-    var memo: String = ""
+    var memoList: List<MemoData>
 )
 
 /**
