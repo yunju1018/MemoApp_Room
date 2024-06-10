@@ -8,25 +8,25 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.viewpager2.widget.ViewPager2
 import com.example.memoapp_room.MemoApplication
 import com.example.memoapp_room.R
 import com.example.memoapp_room.databinding.ActivityMainBinding
 import com.example.memoapp_room.memo.models.MemoData
+import com.example.memoapp_room.memo.utils.DateFormatUtil
 import com.example.memoapp_room.room.MemoEntity
 import com.example.memoapp_room.viewmodel.MemoViewModel
 import com.example.memoapp_room.viewmodel.MemoViewModelFactory
-import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 @SuppressLint("StaticFieldLeak")
 class MainActivity : AppCompatActivity() {
-    private lateinit var memoAdapter: MemoAdapter
+    private lateinit var memoPagerAdapter: MemoPagerAdapter
     private lateinit var binding: ActivityMainBinding
 
     private val date = Calendar.getInstance()
-    private val keyDateFormat = SimpleDateFormat("yyMMdd")
-    private val simpleDateFormat = SimpleDateFormat("yy년 MM월 dd일")
+    private var key : String = ""
+    private val TAG = MainActivity::class.simpleName
 
     private val viewModel by lazy {
         MemoViewModelFactory((application as MemoApplication).memoRepository).create(MemoViewModel::class.java)
@@ -34,45 +34,84 @@ class MainActivity : AppCompatActivity() {
 
     private val datePickerListener = DatePickerDialog.OnDateSetListener { p0, year, month, day ->
         Log.d("yj", "year : $year, month : $month, day : $day")
+        val selectDate = Calendar.getInstance()
+        selectDate.set(year, month, day)
+
+        if (selectDate != date) {
+            val newMemo = MemoEntity(DateFormatUtil.keyDateFormat.format(selectDate.time).toLong(), mutableListOf())
+            viewModel.insertMemo(newMemo)
+        }
         date.set(year, month, day)
-        binding.title.text = simpleDateFormat.format(date.time)
+        binding.title.text = DateFormatUtil.titleDateFormat.format(date.time)
+        setToday()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        setToday()
         setLayout()
         observe()
     }
 
     private fun observe() {
         viewModel.memoList.observe(this, Observer {
-            memoAdapter.setList(it)
-            it.forEach{entity ->
-                Log.d("yj", "memoEntities : ${entity.id} , ${entity.memoList}")
+            memoPagerAdapter.setList(it)
+
+            it.forEachIndexed { index, memoEntity ->
+                if (key.isNotEmpty() && memoEntity.id == key.toLong()) {
+                    binding.viewPager.setCurrentItem(index)
+                }
             }
         })
     }
 
     private fun setLayout() {
-        memoAdapter = MemoAdapter(this) {
-            viewModel.deleteMemo(it)
+        val memoList = viewModel.memoList
+        Log.d(TAG, "setLayout memoList : ${memoList.value?.size}")
+
+        memoPagerAdapter = MemoPagerAdapter(this) {key, data ->
+
+        }
+        binding.viewPager.apply {
+            adapter = memoPagerAdapter
+            offscreenPageLimit = 3
         }
 
-        val memoEntity = viewModel.getMemoData(keyDateFormat.format(date.time).toLong())
-        Log.d("yj", "today data : $memoEntity")
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                Log.d(TAG, "registerOnPageChangeCallback position: $position")
+                Log.d(TAG, "memoList.value.size: ${memoList.value?.size}")
 
-        binding.recyclerView.adapter = memoAdapter
+                if (memoList.value?.isNotEmpty() == true) {
+                    key = memoList.value?.get(position)?.id.toString()
+                    binding.title.text = DateFormatUtil.setTitle(key)
+                } else {
+                    setToday()
+                }
+            }
+        })
 
-        binding.button.setOnClickListener {
-            val key = keyDateFormat.format(date.time)
+        binding.addButton.setOnClickListener {
+            Log.d(TAG, "key : $key")
+            if(key.isEmpty()) {
+                setToday()
+            }
+//            val memoDataList = memoList.value?.get(keyPosition)?.memoList?.toMutableList() ?: mutableListOf()
+            // `memoList`가 null이 아니고 `keyPosition`이 유효한지 확인
+            val memoListValue = memoList.value
+            val memoDataList: MutableList<MemoData> = mutableListOf()
 
-            Log.d("yj", "key : $key")
-            val memoList = ArrayList<MemoData>()
-            memoList.add(MemoData(binding.edtMemo.text.toString()))
+            memoListValue?.forEach {
+                if (it.id == key.toLong()) {
+                    val data = it.memoList.toMutableList()
+                    memoDataList.addAll(data)
+                    memoDataList.add(MemoData(binding.edtMemo.text.toString()))
+                }
+            }
 
-            val memo = MemoEntity(key.toLong(), memoList)
+            val memo = MemoEntity(key.toLong(), memoDataList)
             viewModel.insertMemo(memo)
             binding.edtMemo.setText("")
         }
@@ -89,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        binding.title.text = simpleDateFormat.format(date.time)
+        binding.title.text = DateFormatUtil.setTitle(key)
         binding.title.setOnClickListener {
             showDatePickerDialog()
         }
@@ -103,5 +142,9 @@ class MainActivity : AppCompatActivity() {
             date.get(Calendar.MONTH),
             date.get((Calendar.DAY_OF_MONTH))
         ).show()
+    }
+
+    private fun setToday() {
+        key = DateFormatUtil.keyDateFormat.format(date.time)
     }
 }
