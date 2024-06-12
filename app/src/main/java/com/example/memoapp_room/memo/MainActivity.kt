@@ -73,6 +73,17 @@ class MainActivity : AppCompatActivity() {
 
         memoPagerAdapter = MemoPagerAdapter(this) {key, data ->
 
+            viewModel.getMemoData(key) { memoEntity ->
+                var memoData : MutableList<MemoData> = mutableListOf()
+                memoEntity?.memoList?.let { memoDataList ->
+                    if (memoDataList.contains(MemoData(data))) {
+                        memoData = memoDataList.filterNot { it == MemoData(data) }.toMutableList()
+                    }
+                }
+                val memo = MemoEntity(key, memoData)
+                viewModel.insertMemo(memo)
+            }
+
         }
         binding.viewPager.apply {
             adapter = memoPagerAdapter
