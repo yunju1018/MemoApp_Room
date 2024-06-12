@@ -11,7 +11,7 @@ import java.io.Serializable
 // id 값을 null로 넣어줘도 자동으로 값이 할당된다.
 data class MemoEntity(
     @PrimaryKey
-    var id: Long?,
+    var id: String,
     var memoList: List<MemoData>
 ) : Serializable
 

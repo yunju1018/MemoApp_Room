@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         selectDate.set(year, month, day)
 
         if (selectDate != date) {
-            val newMemo = MemoEntity(DateFormatUtil.keyDateFormat.format(selectDate.time).toLong(), mutableListOf())
+            val newMemo = MemoEntity(DateFormatUtil.keyDateFormat.format(selectDate.time), mutableListOf())
             viewModel.insertMemo(newMemo)
         }
         date.set(year, month, day)
@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity() {
             memoPagerAdapter.setList(it)
 
             it.forEachIndexed { index, memoEntity ->
-                if (key.isNotEmpty() && memoEntity.id == key.toLong()) {
-                    binding.viewPager.setCurrentItem(index)
+                if (key.isNotEmpty() && memoEntity.id == key) {
+                    binding.viewPager.currentItem = index
                 }
             }
         })
@@ -104,14 +104,14 @@ class MainActivity : AppCompatActivity() {
             val memoDataList: MutableList<MemoData> = mutableListOf()
 
             memoListValue?.forEach {
-                if (it.id == key.toLong()) {
+                if (it.id == key) {
                     val data = it.memoList.toMutableList()
                     memoDataList.addAll(data)
                     memoDataList.add(MemoData(binding.edtMemo.text.toString()))
                 }
             }
 
-            val memo = MemoEntity(key.toLong(), memoDataList)
+            val memo = MemoEntity(key, memoDataList)
             viewModel.insertMemo(memo)
             binding.edtMemo.setText("")
         }

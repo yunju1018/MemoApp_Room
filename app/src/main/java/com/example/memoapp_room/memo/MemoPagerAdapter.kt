@@ -9,7 +9,7 @@ import com.example.memoapp_room.room.MemoEntity
 
 class MemoPagerAdapter(
     val fa: FragmentActivity,
-    val callback: (Long?, String) -> Unit
+    val callback: (String, String) -> Unit
 ) : FragmentStateAdapter(fa) {
 
     private var memoList = listOf<MemoEntity>()
@@ -26,6 +26,7 @@ class MemoPagerAdapter(
     fun setList(memoList: List<MemoEntity>) {
         Log.d(TAG, "setList : ${memoList}")
         this.memoList = memoList
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(

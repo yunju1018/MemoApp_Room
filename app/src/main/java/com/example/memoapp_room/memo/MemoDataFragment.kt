@@ -16,9 +16,9 @@ import java.util.Arrays
 class MemoDataFragment() : Fragment() {
 
     companion object {
-        var callBack:((Long?, String) -> Unit)? = null
+        var callBack:((String, String) -> Unit)? = null
 
-        fun newInstance(data: MemoEntity, callback: ((Long?, String) -> Unit)): MemoDataFragment {
+        fun newInstance(data: MemoEntity, callback: ((String, String) -> Unit)): MemoDataFragment {
             val args = Bundle()
             this.callBack = callback
             return MemoDataFragment().apply {
@@ -33,7 +33,7 @@ class MemoDataFragment() : Fragment() {
     private lateinit var adapter : MemoAdapter
     private lateinit var binding : FragmentMemoDataBinding
     private lateinit var data: MemoEntity
-    private var key : Long? = null
+    private var key = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,7 +59,7 @@ class MemoDataFragment() : Fragment() {
             Log.d(TAG, "delete key : $key data : $it")
             callBack?.invoke(key, it)
         }
-        adapter.setList(data.memoList)
+        setData(data)
 
         with(binding) {
             recyclerView.adapter = adapter

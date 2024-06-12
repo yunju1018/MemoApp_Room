@@ -9,11 +9,11 @@ interface MemoDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)   // primary key 같을 경우 덮어쓰기
     fun insertMemo(memo : MemoEntity)
 
-    @Query("SELECT * FROM memo")
+    @Query("SELECT * FROM memo ORDER BY id ASC")
     fun getAll() : LiveData<List<MemoEntity>>
 
     @Query("SELECT * FROM memo WHERE id = :memoId")
-    fun getMemo(memoId: Long) : LiveData<MemoEntity>
+    fun getMemo(memoId: String) : LiveData<MemoEntity>
 
     @Delete
     fun delete(memo : MemoEntity)

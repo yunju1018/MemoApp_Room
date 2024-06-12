@@ -22,7 +22,7 @@ class MemoRepository(private val memoDao: MemoDAO) {
         return memoDao.getAll()
     }
 
-    fun getMemoData(memoId: Long): LiveData<MemoEntity> {
+    fun getMemoData(memoId: String): LiveData<MemoEntity> {
         return memoDao.getMemo(memoId)
     }
 

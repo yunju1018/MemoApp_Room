@@ -17,7 +17,7 @@ class MemoViewModel(private val memoRepository: MemoRepository) : ViewModel() {
     // Repository -> DataSource(local/remote) 로부터 데이터 요청
 
     val memoList: LiveData<List<MemoEntity>> = memoRepository.getMomoList()
-    fun getMemoData(id: Long) : LiveData<MemoEntity> {
+    fun getMemoData(id: String) : LiveData<MemoEntity> {
         return memoRepository.getMemoData(id)
     }
 
