@@ -8,7 +8,6 @@ import com.example.memoapp_room.room.MemoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class MemoViewModel(private val memoRepository: MemoRepository) : ViewModel() {
     // Repository Pattern
@@ -17,8 +16,11 @@ class MemoViewModel(private val memoRepository: MemoRepository) : ViewModel() {
     // Repository -> DataSource(local/remote) 로부터 데이터 요청
 
     val memoList: LiveData<List<MemoEntity>> = memoRepository.getMomoList()
-    fun getMemoData(id: String) : LiveData<MemoEntity> {
-        return memoRepository.getMemoData(id)
+    fun getMemoData(id: String, onResult:(MemoEntity?) -> Unit) {
+        viewModelScope.launch {
+            val memo = memoRepository.getMemoData(id)
+            onResult(memo)
+        }
     }
 
     fun insertMemo(memo: MemoEntity) {

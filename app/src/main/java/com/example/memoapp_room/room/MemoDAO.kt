@@ -13,7 +13,7 @@ interface MemoDAO {
     fun getAll() : LiveData<List<MemoEntity>>
 
     @Query("SELECT * FROM memo WHERE id = :memoId")
-    fun getMemo(memoId: String) : LiveData<MemoEntity>
+    suspend fun getMemo(memoId: String) : MemoEntity?
 
     @Delete
     fun delete(memo : MemoEntity)

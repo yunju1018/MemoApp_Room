@@ -98,22 +98,18 @@ class MainActivity : AppCompatActivity() {
             if(key.isEmpty()) {
                 setToday()
             }
-//            val memoDataList = memoList.value?.get(keyPosition)?.memoList?.toMutableList() ?: mutableListOf()
-            // `memoList`가 null이 아니고 `keyPosition`이 유효한지 확인
-            val memoListValue = memoList.value
-            val memoDataList: MutableList<MemoData> = mutableListOf()
 
-            memoListValue?.forEach {
-                if (it.id == key) {
-                    val data = it.memoList.toMutableList()
-                    memoDataList.addAll(data)
-                    memoDataList.add(MemoData(binding.edtMemo.text.toString()))
+            viewModel.getMemoData(key) {memoEntity ->
+                val memoData : MutableList<MemoData> = mutableListOf()
+                memoEntity?.memoList?.let { it ->
+                    memoData.addAll(it)
                 }
-            }
 
-            val memo = MemoEntity(key, memoDataList)
-            viewModel.insertMemo(memo)
-            binding.edtMemo.setText("")
+                memoData.add(MemoData(binding.edtMemo.text.toString()))
+                val memo = MemoEntity(key, memoData)
+                viewModel.insertMemo(memo)
+                binding.edtMemo.setText("")
+            }
         }
 
         binding.deleteAll.setOnClickListener {
