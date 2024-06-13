@@ -11,7 +11,7 @@ import com.example.memoapp_room.R
 import com.example.memoapp_room.databinding.ItemMemoBinding
 import com.example.memoapp_room.memo.models.MemoData
 
-class MemoAdapter(val context: Context, private val callback: ((String) -> Unit)) :
+class MemoAdapter(val context: Context, private val callback: ((Int) -> Unit)) :
     RecyclerView.Adapter<MemoAdapter.MyViewHolder>() {
     private var memoList = listOf<MemoData>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -23,7 +23,7 @@ class MemoAdapter(val context: Context, private val callback: ((String) -> Unit)
     override fun getItemCount(): Int = memoList.size
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.bind(memoList[position])
+        holder.bind(memoList[position], position)
     }
 
     fun setList(memoList: List<MemoData>) {
@@ -33,7 +33,7 @@ class MemoAdapter(val context: Context, private val callback: ((String) -> Unit)
 
     inner class MyViewHolder(private val binding: ItemMemoBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(memo: MemoData) {
+        fun bind(memo: MemoData, position: Int) {
             binding.textViewMemo.text = memo.memo
 
             itemView.setOnLongClickListener(View.OnLongClickListener {
@@ -41,7 +41,7 @@ class MemoAdapter(val context: Context, private val callback: ((String) -> Unit)
                     .setTitle("삭제하시겠습니까?")
                     .setPositiveButton(
                         "예"
-                    ) { p0, p1 -> callback.invoke(memo.memo)}
+                    ) { p0, p1 -> callback.invoke(position)}
                     .setNegativeButton("아니오", null)
                     .create()
                     .show()

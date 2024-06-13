@@ -16,9 +16,10 @@ import java.util.Arrays
 class MemoDataFragment() : Fragment() {
 
     companion object {
-        var callBack:((String, String) -> Unit)? = null
+        val TAG = MemoPagerAdapter::class.simpleName
+        var callBack:((String, Int) -> Unit)? = null
 
-        fun newInstance(data: MemoEntity, callback: ((String, String) -> Unit)): MemoDataFragment {
+        fun newInstance(data: MemoEntity, callback: ((String, Int) -> Unit)): MemoDataFragment {
             val args = Bundle()
             this.callBack = callback
             return MemoDataFragment().apply {
@@ -29,7 +30,6 @@ class MemoDataFragment() : Fragment() {
         }
     }
 
-    private val TAG = MemoPagerAdapter::class.simpleName
     private lateinit var adapter : MemoAdapter
     private lateinit var binding : FragmentMemoDataBinding
     private lateinit var data: MemoEntity

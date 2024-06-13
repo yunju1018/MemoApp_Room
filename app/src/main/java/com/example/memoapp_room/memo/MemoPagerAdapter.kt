@@ -9,22 +9,25 @@ import com.example.memoapp_room.room.MemoEntity
 
 class MemoPagerAdapter(
     val fa: FragmentActivity,
-    val callback: (String, String) -> Unit
+    val callback: (String, Int) -> Unit
 ) : FragmentStateAdapter(fa) {
 
+    companion object {
+        val TAG = MemoPagerAdapter::class.simpleName
+    }
     private var memoList = listOf<MemoEntity>()
-    private val TAG = MemoPagerAdapter::class.simpleName
+
     override fun getItemCount(): Int = if (memoList.isNotEmpty()) memoList.size else 0
 
     override fun createFragment(position: Int): Fragment {
         Log.d(TAG, "createFragment : ${memoList}")
-        return MemoDataFragment.newInstance(memoList[position]) { key, Data ->
-            callback.invoke(key, Data)
+        return MemoDataFragment.newInstance(memoList[position]) { key, position ->
+            callback.invoke(key, position)
         }
     }
 
     fun setList(memoList: List<MemoEntity>) {
-        Log.d(TAG, "setList : ${memoList}")
+        Log.d(TAG, "setList : $memoList")
         this.memoList = memoList
         notifyDataSetChanged()
     }

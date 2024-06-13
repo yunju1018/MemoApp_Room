@@ -1,6 +1,5 @@
 package com.example.memoapp_room.memo
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -19,14 +18,17 @@ import com.example.memoapp_room.viewmodel.MemoViewModel
 import com.example.memoapp_room.viewmodel.MemoViewModelFactory
 import java.util.*
 
-@SuppressLint("StaticFieldLeak")
+
 class MainActivity : AppCompatActivity() {
+    companion object {
+        val TAG = MainActivity::class.simpleName
+    }
+
     private lateinit var memoPagerAdapter: MemoPagerAdapter
     private lateinit var binding: ActivityMainBinding
 
     private val date = Calendar.getInstance()
     private var key : String = ""
-    private val TAG = MainActivity::class.simpleName
 
     private val viewModel by lazy {
         MemoViewModelFactory((application as MemoApplication).memoRepository).create(MemoViewModel::class.java)
@@ -71,20 +73,18 @@ class MainActivity : AppCompatActivity() {
         val memoList = viewModel.memoList
         Log.d(TAG, "setLayout memoList : ${memoList.value?.size}")
 
-        memoPagerAdapter = MemoPagerAdapter(this) {key, data ->
-
+        memoPagerAdapter = MemoPagerAdapter(this) {key, position ->
             viewModel.getMemoData(key) { memoEntity ->
-                var memoData : MutableList<MemoData> = mutableListOf()
                 memoEntity?.memoList?.let { memoDataList ->
-                    if (memoDataList.contains(MemoData(data))) {
-                        memoData = memoDataList.filterNot { it == MemoData(data) }.toMutableList()
-                    }
-                }
-                val memo = MemoEntity(key, memoData)
-                viewModel.insertMemo(memo)
-            }
+                    val memoData : MutableList<MemoData> = memoDataList.toMutableList()
+                    memoData.removeAt(position)
 
+                    val memo = MemoEntity(key, memoData)
+                    viewModel.insertMemo(memo)
+                }
+            }
         }
+
         binding.viewPager.apply {
             adapter = memoPagerAdapter
             offscreenPageLimit = 3
