@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.example.memoapp_room'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.memoapp_room"
-        minSdk 24
-        targetSdk 33
+        minSdk 26
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -39,6 +39,9 @@ android {
 }
 
 dependencies {
+    // The view calendar library
+    implementation 'com.kizitonwose.calendar:view:2.5.1'
+
     // Gson
     implementation 'com.google.code.gson:gson:2.10.1'
 

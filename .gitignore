@@ -21,3 +21,6 @@ local.properties
 .idea/deploymentTargetDropDown.xml
 .idea/kotlinc.xml
 .idea/migrations.xml
+.idea/codeStyles/codeStyleConfig.xml
+.idea/codeStyles/Project.xml
+.idea/deploymentTargetSelector.xml

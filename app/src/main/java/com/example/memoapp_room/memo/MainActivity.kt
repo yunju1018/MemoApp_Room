@@ -2,6 +2,7 @@ package com.example.memoapp_room.memo
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import com.example.memoapp_room.MemoApplication
 import com.example.memoapp_room.R
+import com.example.memoapp_room.calendar.CalendarActivity
 import com.example.memoapp_room.databinding.ActivityMainBinding
 import com.example.memoapp_room.memo.models.MemoData
 import com.example.memoapp_room.memo.utils.DateFormatUtil
@@ -133,6 +135,11 @@ class MainActivity : AppCompatActivity() {
                 .create()
                 .show()
 
+        }
+
+        binding.calendar.setOnClickListener {
+            val intent = Intent(this, CalendarActivity::class.java)
+            startActivity(intent)
         }
 
         binding.title.text = DateFormatUtil.setTitle(key)
